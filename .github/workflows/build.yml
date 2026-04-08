@@ -33,9 +33,10 @@ jobs:
         shell: bash
         run: |
           ver="${{ steps.get_version.outputs.VERSION }}"
-
+          set -x;
           curl "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fmholt%2Fcaddy-l4" -o ./caddy-amd64
           curl "https://caddyserver.com/api/download?os=linux&arch=arm64&p=github.com%2Fmholt%2Fcaddy-l4" -o ./caddy-arm64
+          set +x;
           chmod +x ./caddy-amd64
           chmod +x ./caddy-arm64
 
