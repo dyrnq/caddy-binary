@@ -34,8 +34,8 @@ jobs:
         run: |
           ver="${{ steps.get_version.outputs.VERSION }}"
 
-          # curl "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fmholt%2Fcaddy-l4" -o ./caddy-amd64
-          # curl "https://caddyserver.com/api/download?os=linux&arch=arm64&p=github.com%2Fmholt%2Fcaddy-l4" -o ./caddy-arm64
+          curl "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fmholt%2Fcaddy-l4" -o ./caddy-amd64
+          curl "https://caddyserver.com/api/download?os=linux&arch=arm64&p=github.com%2Fmholt%2Fcaddy-l4" -o ./caddy-arm64
           chmod +x ./caddy-amd64
           chmod +x ./caddy-arm64
 
