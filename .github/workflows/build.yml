@@ -1,0 +1,66 @@
+name: build and release
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
+    # tags-ignore:
+    #   - main
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Test version
+        run: |
+          echo ${{ steps.get_version.outputs.VERSION }}
+          echo ${{ github.ref }}
+
+
+      - name: download binaries
+        shell: bash
+        run: |
+          ver="${{ steps.get_version.outputs.VERSION }}"
+
+          # curl "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fmholt%2Fcaddy-l4" -o ./caddy-amd64
+          # curl "https://caddyserver.com/api/download?os=linux&arch=arm64&p=github.com%2Fmholt%2Fcaddy-l4" -o ./caddy-arm64
+          chmod +x ./caddy-amd64
+          chmod +x ./caddy-arm64
+
+          tar -cv --zstd  -f caddy-amd64.tar.zstd ./caddy-amd64
+          tar -cv --xz    -f caddy-amd64.tar.xz   ./caddy-amd64
+          tar -cv --gzip  -f caddy-amd64.tar.gz   ./caddy-amd64
+
+
+          tar -cv --zstd  -f caddy-arm64.tar.zstd ./caddy-arm64
+          tar -cv --xz    -f caddy-arm64.tar.xz   ./caddy-arm64
+          tar -cv --gzip  -f caddy-arm64.tar.gz   ./caddy-arm64
+
+
+          ls -l ./
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body: "Release caddy ${{ steps.get_version.outputs.VERSION }}.  \n source: https://github.com/caddyserver/caddy/releases/tag/${{ steps.get_version.outputs.VERSION }}"
+          files: |
+            ./caddy-amd64
+            ./caddy-amd64.tar.zstd
+            ./caddy-amd64.tar.xz
+            ./caddy-amd64.tar.xz
+            ./caddy-arm64
+            ./caddy-arm64.tar.zstd
+            ./caddy-arm64.tar.xz
+            ./caddy-arm64.tar.xz
